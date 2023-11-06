@@ -75,6 +75,8 @@ public class ServletPrincipal extends HttpServlet {
                     empleado.setDui(rs.getString("dui"));
                     empleado.setIsss(rs.getInt("isss"));
                     empleado.setID_Direccion(rs.getInt("ID_Direccion"));
+                    empleado.setID_Cargo(rs.getInt("ID_TipoEmpleado"));
+
                     listaEmpleados.add(empleado);
                 }               
                 request.setAttribute("listaEmpleados", listaEmpleados);
@@ -85,7 +87,119 @@ public class ServletPrincipal extends HttpServlet {
             ex.printStackTrace();
         }
     }
-    
+     
+     
+     public void agregarEmpleado(HttpServletRequest request, HttpServletResponse response) {
+        //CAPTURA DE VARIABLES
+        //El ID de los empleados es autoincrementable
+        String nombresEmpleado = request.getParameter("nombresEmpleado");
+        String apellidosEmpleado = request.getParameter("apellidosEmpleado");
+        String fechaNacEmpleado = request.getParameter("fechaNac");
+        String telefonoEmpleado = request.getParameter("telefono");
+        String correo = request.getParameter("correo");
+        String DUI_Empleado = request.getParameter("dui");
+        String ISSS_Empleado = request.getParameter("isss");
+        String ID_Direccion = request.getParameter("ID_Direccion");
+        String ID_Cargo = request.getParameter("ID_Cargo");
+
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            try (Connection conn = DriverManager.getConnection(url)) {
+                request.setAttribute("mensaje_conexion", "Ok!");
+                String sql = "insert into Empleados values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, nombresEmpleado);
+                pstmt.setString(2, apellidosEmpleado);
+                pstmt.setString(3, fechaNacEmpleado);
+                pstmt.setString(4, telefonoEmpleado);
+                pstmt.setString(5, correo);
+                pstmt.setString(6, DUI_Empleado);
+                pstmt.setString(7, ISSS_Empleado);
+                pstmt.setString(8, ID_Direccion);
+                pstmt.setString(9, ID_Cargo);
+                int registros = pstmt.executeUpdate();
+                if (registros > 0) {
+                    request.getSession().setAttribute("exito", true);
+                } else {
+                    request.getSession().setAttribute("exito", false);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException ex) {
+            request.getSession().setAttribute("exito", false);
+            ex.printStackTrace();
+        }
+    }
+
+//Funciones de actualizacion de registros (UPDATE)
+    public void modificarEmpleado(HttpServletRequest request, HttpServletResponse response) {
+        //CAPTURA DE VARIABLES
+        String ID_Empleado = request.getParameter("ID_Empleado");
+        String nombresEmpleado = request.getParameter("nombresEmpleado");
+        String apellidosEmpleado = request.getParameter("apellidosEmpleado");
+        String fechaNacEmpleado = request.getParameter("fechaNac");
+        String telefonoEmpleado = request.getParameter("telefono");
+        String correo = request.getParameter("correo");
+        String DUI_Empleado = request.getParameter("dui");
+        String ISSS_Empleado = request.getParameter("isss");
+        String ID_Direccion = request.getParameter("ID_Direccion");
+        String ID_Cargo = request.getParameter("ID_Cargo");
+
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            try (Connection conn = DriverManager.getConnection(url)) {
+                request.setAttribute("mensaje_conexion", "Ok!");
+                
+               String sql = "update Empleados set "
+                 + "NombresEmpleado='"+nombresEmpleado+"', "  
+                 + "ApellidosEmpleado='"+apellidosEmpleado+"', "
+                 + "FechaNac='"+fechaNacEmpleado+"', "
+                 + "Telefono='"+telefonoEmpleado+"', "
+                 + "Correo='"+correo+"', " 
+                 + "DUI='"+DUI_Empleado+"', "
+                 + "ISSS='"+ISSS_Empleado+"', "
+                 + "ID_Direccion='"+ID_Direccion+"' "
+                 + "ID_TipoEmpleado='"+ID_Cargo+"', "
+                 + "where ID_Empleado='"+ID_Empleado+"'";
+                
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                int registros = pstmt.executeUpdate();
+                if (registros > 0) {
+                    request.getSession().setAttribute("exito", true);
+                } else {
+                    request.getSession().setAttribute("exito", false);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException ex) {
+            request.getSession().setAttribute("exito", false);
+            ex.printStackTrace();
+        }
+    }
+
+    public void eliminarEmpleado(HttpServletRequest request, HttpServletResponse response) {
+    // Obtener el ID del empleado a eliminar desde la solicitud
+    String idEmpleado = request.getParameter("id");
+
+    try {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        try (Connection conn = DriverManager.getConnection(url)) {
+            request.setAttribute("mensaje_conexion", "Ok!");
+            String sql = "DELETE FROM Empleados WHERE ID_Empleado = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, idEmpleado);
+            int registros = pstmt.executeUpdate();
+            if (registros > 0) {
+                // Éxito al eliminar el empleado
+                request.getSession().setAttribute("exito", true);
+            } else {
+                // No se encontró al empleado a eliminar
+                request.getSession().setAttribute("exito", false);
+            }
+        }
+    } catch (SQLException | ClassNotFoundException ex) {
+        request.getSession().setAttribute("exito", false);
+        ex.printStackTrace();
+    }
+}
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -165,13 +279,13 @@ public class ServletPrincipal extends HttpServlet {
             //LOS DATOS SE LE PASAN POR PARAMETRO A LA FUNCION
             agregarEmpleado(request, response);
             //REDIRIGE NUEVAMENTE A LA VISTA DE AGREGAR EMPLEADO
-            response.sendRedirect(request.getContextPath() + "Agroservicio?accion=AgregarEmpleado");
+            response.sendRedirect(request.getContextPath() + "/ServletPrincipal?accion=AgregarEmpleado");
         } else if (accion.equals("ModificarEmpleado")) {
-            //modificarEmpleado(request, response);
-            response.sendRedirect(request.getContextPath() + "/Agroservicio?accion=GestionarEmpleados");
+            modificarEmpleado(request, response);
+            response.sendRedirect(request.getContextPath() + "/ServletPrincipal?accion=GestionarEmpleados");
         } else if (accion.equals("EliminarEmpleado")) {
            // eliminarEmpleado(request, response);
-            response.sendRedirect(request.getContextPath() + "/Agroservicio?accion=GestionarEmpleados");
+            response.sendRedirect(request.getContextPath() + "/ServletPrincipal?accion=GestionarEmpleados");
         }
     }
 
@@ -188,46 +302,4 @@ public class ServletPrincipal extends HttpServlet {
     
     
     
-    public void agregarEmpleado(HttpServletRequest request, HttpServletResponse response) {
-        //CAPTURA DE VARIABLES
-        //El ID de los empleados es autoincrementable
-        String DUI_Empleado = request.getParameter("dui");
-        String ISSS_Empleado = request.getParameter("isss");
-        String nombresEmpleado = request.getParameter("nombresEmpleado");
-        String apellidosEmpleado = request.getParameter("apellidosEmpleado");
-        String fechaNacEmpleado = request.getParameter("fechaNac");
-        String telefonoEmpleado = request.getParameter("telefono");
-        String correo = request.getParameter("correo");
-        String ID_Cargo = request.getParameter("ID_Cargo");
-        String ID_Direccion = request.getParameter("ID_Direccion");
-
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            try (Connection conn = DriverManager.getConnection(url)) {
-                request.setAttribute("mensaje_conexion", "Ok!");
-                String sql = "insert into Empleados values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1, nombresEmpleado);
-                pstmt.setString(2, apellidosEmpleado);
-                pstmt.setString(3, fechaNacEmpleado);
-                pstmt.setString(4, telefonoEmpleado);
-                pstmt.setString(5, correo);
-                pstmt.setString(6, DUI_Empleado);
-                pstmt.setString(7, ISSS_Empleado);
-               // pstmt.setString(8, ID_Cargo);
-                pstmt.setString(9, ID_Direccion);
-                int registros = pstmt.executeUpdate();
-                if (registros > 0) {
-                    request.getSession().setAttribute("exito", true);
-                } else {
-                    request.getSession().setAttribute("exito", false);
-                }
-            }
-        } catch (SQLException | ClassNotFoundException ex) {
-            request.getSession().setAttribute("exito", false);
-            ex.printStackTrace();
-        }
-    }
 }
-
-

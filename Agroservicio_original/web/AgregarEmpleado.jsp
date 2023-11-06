@@ -3,7 +3,7 @@
     Created on : 4 nov 2023, 08:10:43
     Author     : ccerr
 --%>
-
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -25,10 +25,6 @@
         <form method="POST" action="/Agroservicio/ServletPrincipal?accion=AgregarEmpleado">
             <div>
                 <!-- El ID de los empleados es autoincrementable -->
-                <label>DUI:</label>
-                <input type="text" name="dui" id="dui" required /><br>
-                <label>Número de afiliado ISSS:</label>
-                <input type="text" name="isss" id="isss" required /><br>
                 <label>Nombres:</label>
                 <input type="text" name="nombresEmpleado" id="nombresEmpleado" required /><br>
                 <label>Apellidos:</label>
@@ -39,6 +35,10 @@
                 <input type="text" name="telefono" id="telefono" required /><br>
                 <label>Correo:</label>
                 <input type="email" name="correo" id="correo" required /><br>
+                <label>DUI:</label>
+                <input type="text" name="dui" id="dui" required /><br>
+                <label>Número de afiliado ISSS:</label>
+                <input type="text" name="isss" id="isss" required /><br>
                 <label>ID Cargo:</label>
                 <input type="text" name="ID_Cargo" id="ID_Cargo" required /><br>
                 <label>ID Dirección:</label>
