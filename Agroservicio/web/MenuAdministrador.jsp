@@ -26,9 +26,6 @@
                 <li><a href="/Agroservicio?accion=GestionarEmpleados">GestionarEmpleados</a></li>
                 <li><a href="/Agroservicio?accion=AgregarEmpleado">AgregarEmpleados</a></li>
                 <li><a href="/Agroservicio?accion=ModificarEmpleado">ModificarEmpledo</a></li>
-
-
-                <!--<li><a href="/SuperMercado?accion="></a></li>-->
             </ul>
         </nav>
     </body>
